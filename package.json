@@ -8,7 +8,7 @@
 		"build": "tsc",
 		"dev": "tsc --watch & nodemon dist",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "source .env; node dist/"
+		"start": ". .env; node dist/"
 	},
 	"husky": {
 		"hooks": {
