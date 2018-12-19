@@ -27,17 +27,13 @@ class App {
 
 	async slackImage(req, res) {
 		let results = await this.findImage(req.query["q"]);
-		res.send(
-			`<a href=${results[0].contentUrl}>${results[0].contentUrl}</a>`
-		);
+		res.send(results[0].contentUrl);
 	}
 
 	async slackMeme(req, res) {
 		let results = await this.findImage(req.query["q"] + " meme");
 		//let confirmedMeme = results.find(result => result.hostPageUrl.includes("knowyourmeme.com"));
-		res.send(
-			`<a href=${results[0].contentUrl}>${results[0].contentUrl}</a>`
-		);
+		res.send(results[0].contentUrl);
 	}
 }
 
