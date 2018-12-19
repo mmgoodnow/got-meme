@@ -1,22 +1,24 @@
 import * as express from "express";
+import * as bodyParser from "body-parser";
 import ImageSearch from "./Search";
+import * as debugPkg from "debug";
+
+const debug = debugPkg("got-meme");
 
 class App {
 	public express;
 
 	constructor() {
 		this.express = express();
+		this.express.use(bodyParser.urlencoded({ extended: true }));
 		this.mountRoutes();
 	}
 
 	private mountRoutes(): void {
 		const router = express.Router();
-		let slackImage = this.slackImage.bind(this);
-		let slackMeme = this.slackMeme.bind(this);
-		router.get("/image", slackImage);
-		router.get("/meme", slackMeme);
-		router.post("/image", slackImage);
-		router.post("/meme", slackMeme);
+		let recieve = this.recieveRequest.bind(this);
+		router.post("/image", recieve);
+		router.post("/meme", recieve);
 
 		this.express.use("/got-meme", router);
 	}
@@ -25,15 +27,34 @@ class App {
 		return await ImageSearch.searchImage(query);
 	}
 
-	async slackImage(req, res) {
-		let results = await this.findImage(req.query["q"]);
-		res.send(results[0].contentUrl);
+	async recieveRequest(req, res) {
+		debug("body", req.body);
+		let query = req.body.text;
+		let command = req.body.command;
+		if (!query) {
+			res.send("Please provide some text to search.");
+			return;
+		}
+		if (command === "/meme") {
+			query += " meme";
+		}
+		let results = await this.findImage(query);
+		let msg = this.formatMsg(req.body.text, results[0].contentUrl);
+		res.setHeader("Content-Type", "application/json");
+		res.send(msg);
 	}
 
-	async slackMeme(req, res) {
-		let results = await this.findImage(req.query["q"] + " meme");
-		//let confirmedMeme = results.find(result => result.hostPageUrl.includes("knowyourmeme.com"));
-		res.send(results[0].contentUrl);
+	formatMsg(query: string, url: string) {
+		let body = {
+			response_type: "in_channel",
+			attachments: [
+				{
+					image_url: url,
+					title: query,
+				},
+			],
+		};
+		return body;
 	}
 }
 
