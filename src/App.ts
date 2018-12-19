@@ -11,9 +11,14 @@ class App {
 
 	private mountRoutes(): void {
 		const router = express.Router();
-		router.get("/image", this.slackImage.bind(this));
-		router.get("/meme", this.slackMeme.bind(this));
-		this.express.use("/", router);
+		let slackImage = this.slackImage.bind(this);
+		let slackMeme = this.slackMeme.bind(this);
+		router.get("/image", slackImage);
+		router.get("/meme", slackMeme);
+		router.post("/image", slackImage);
+		router.post("/meme", slackMeme);
+
+		this.express.use("/got-meme", router);
 	}
 
 	async findImage(query: string) {
