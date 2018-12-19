@@ -4,6 +4,7 @@
 	"description": "Search for memes from Slack",
 	"main": "index.js",
 	"scripts": {
+		"tsc": "tsc",
 		"build": "tsc",
 		"dev": "tsc --watch & nodemon dist",
 		"test": "echo \"Error: no test specified\" && exit 1",
